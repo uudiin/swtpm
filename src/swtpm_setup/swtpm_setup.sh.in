@@ -532,8 +532,13 @@ port = $TSS_TCSD_PORT
 system_ps_file = $TCSD_DATA_FILE
 EOF
 		# tcsd requires @TSS_USER@:@TSS_GROUP@ and 0600 on TCSD_CONFIG
+		# 0640 is needed if user != group
 		# -> only root can start
-		chmod 600 "$TCSD_CONFIG"
+		if [ "@TSS_USER@" = "@TSS_GROUP@" ]; then
+			chmod 0600 "$TCSD_CONFIG"
+		else
+			chmod 0640 "$TCSD_CONFIG"
+		fi
 		if [ $(id -u) -eq 0 ]; then
 			chown "@TSS_USER@:@TSS_GROUP@" "$TCSD_CONFIG" 2>/dev/null
 			chown "@TSS_USER@:@TSS_GROUP@" "$TCSD_DATA_DIR" 2>/dev/null
